@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-deactivated {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-right: 8px;
+        }
+
+        .btn-approve {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        .btn-deactivate {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-deactivate:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+        .btn-view {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 10px;
+            }
+            
+            .btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🔐 Admin Dashboard</h1>
+            <p>User & Transaction Management System</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('overview')">📊 Overview</button>
+            <button class="tab-btn" onclick="switchTab('sellers')">👥 Manage Sellers</button>
+            <button class="tab-btn" onclick="switchTab('transactions')">💳 Transactions</button>
+            <button class="tab-btn" onclick="switchTab('logs')">📋 Activity Logs</button>
+        </div>
+
+        <div id="message-container"></div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="stats-grid" id="stats-grid">
+                <div class="loading">Loading statistics...</div>
+            </div>
+
+            <div class="card">
+                <h2>Pending Approvals</h2>
+                <div id="pending-sellers-container">
+                    <div class="loading">Loading pending sellers...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sellers Tab -->
+        <div id="sellers" class="tab-content">
+            <div class="card">
+                <h2>All Sellers</h2>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="seller-status-filter" onchange="filterSellers()">
+                            <option value="">All</option>
+                            <option value="pending">Pending</option>
+                            <option value="active">Active</option>
+                            <option value="deactivated">Deactivated</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="sellers-container">
+                    <div class="loading">Loading sellers...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions Tab -->
+        <div id="transactions" class="tab-content">
+            <div class="stats-grid" id="transaction-stats">
+                <div class="loading">Loading transaction statistics...</div>
+            </div>
+
+            <div class="card">
+                <h2>Transaction History</h2>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="transaction-status-filter" onchange="filterTransactions()">
+                            <option value="">All</option>
+                            <option value="completed">Completed</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="transactions-container">
+                    <div class="loading">Loading transactions...</div>
+                </div>
+                <div id="transaction-pagination" class="pagination"></div>
+            </div>
+        </div>
+
+        <!-- Activity Logs Tab -->
+        <div id="logs" class="tab-content">
+            <div class="card">
+                <h2>Activity Logs</h2>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label>Action Type</label>
+                        <select id="log-action-filter" onchange="filterLogs()">
+                            <option value="">All</option>
+                            <option value="login">Login</option>
+                            <option value="approved_seller">Approved Seller</option>
+                            <option value="deactivated_seller">Deactivated Seller</option>
+                            <option value="created_product">Created Product</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="logs-container">
+                    <div class="loading">Loading activity logs...</div>
+                </div>
+                <div id="logs-pagination" class="pagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let currentTransactionPage = 1;
+        let currentLogsPage = 1;
+
+        // Initialize on page load
+        window.onload = () => {
+            loadStats();
+            loadPendingSellers();
+        };
+
+        // Tab switching
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const btns = document.querySelectorAll('.tab-btn');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            btns.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'overview') {
+                loadStats();
+                loadPendingSellers();
+            }
+            if (tabName === 'sellers') loadSellers();
+            if (tabName === 'transactions') {
+                loadTransactionStats();
+                loadTransactions();
+            }
+            if (tabName === 'logs') loadActivityLogs();
+        }
+
+        // Show message
+        function showMessage(message, type = 'success') {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => container.innerHTML = '', 5000);
+        }
+
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}/users/stats`);
+                const data = await response.json();
+                
+                const statsHTML = `
+                    <div class="stat-card">
+                        <h3>Total Sellers</h3>
+                        <div class="value">${data.data.totalSellers}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Sellers</h3>
+                        <div class="value">${data.data.activeSellers}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Pending Approvals</h3>
+                        <div class="value">${data.data.pendingSellers}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Deactivated</h3>
+                        <div class="value">${data.data.deactivatedSellers}</div>
+                    </div>
+                `;
+                
+                document.getElementById('stats-grid').innerHTML = statsHTML;
+            } catch (error) {
+                document.getElementById('stats-grid').innerHTML = 
+                    '<div class="error">Failed to load statistics</div>';
+            }
+        }
+
+        // Load pending sellers
+        async function loadPendingSellers() {
+            try {
+                const response = await fetch(`${API_URL}/users/sellers/pending`);
+                const data = await response.json();
+                
+                if (data.data.length === 0) {
+                    document.getElementById('pending-sellers-container').innerHTML = 
+                        '<div class="empty-state">No pending sellers</div>';
+                    return;
+                }
+                
+                const tableHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Registration Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.data.map(seller => `
+                                <tr>
+                                    <td>${seller.name}</td>
+                                    <td>${seller.email}</td>
+                                    <td>${seller.phone}</td>
+                                    <td>${new Date(seller.createdAt).toLocaleDateString()}</td>
+                                    <td><span class="status-badge status-${seller.status}">${seller.status}</span></td>
+                                    <td>
+                                        <button class="btn btn-approve" onclick="approveSeller('${seller.id}')">Approve</button>
+                                        <button class="btn btn-deactivate" onclick="deactivateSeller('${seller.id}')">Reject</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                
+                document.getElementById('pending-sellers-container').innerHTML = tableHTML;
+            } catch (error) {
+                document.getElementById('pending-sellers-container').innerHTML = 
+                    '<div class="error">Failed to load pending sellers</div>';
+            }
+        }
+
+        // Load all sellers
+        async function loadSellers() {
+            try {
+                const response = await fetch(`${API_URL}/users/sellers`);
+                const data = await response.json();
+                
+                displaySellers(data.data);
+            } catch (error) {
+                document.getElementById('sellers-container').innerHTML = 
+                    '<div class="error">Failed to load sellers</div>';
+            }
+        }
+
+        // Display sellers
+        function displaySellers(sellers) {
+            if (sellers.length === 0) {
+                document.getElementById('sellers-container').innerHTML = 
+                    '<div class="empty-state">No sellers found</div>';
+                return;
+            }
+            
+            const tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Registration Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sellers.map(seller => `
+                            <tr>
+                                <td>${seller.name}</td>
+                                <td>${seller.email}</td>
+                                <td>${seller.phone}</td>
+                                <td>${new Date(seller.createdAt).toLocaleDateString()}</td>
+                                <td><span class="status-badge status-${seller.status}">${seller.status}</span></td>
+                                <td>
+                                    ${seller.status === 'pending' ? 
+                                        `<button class="btn btn-approve" onclick="approveSeller('${seller.id}')">Approve</button>` : ''}
+                                    ${seller.status === 'active' ? 
+                                        `<button class="btn btn-deactivate" onclick="deactivateSeller('${seller.id}')">Deactivate</button>` : ''}
+                                    ${seller.status === 'deactivated' ? 
+                                        `<button class="btn btn-approve" onclick="approveSeller('${seller.id}')">Reactivate</button>` : ''}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('sellers-container').innerHTML = tableHTML;
+        }
+
+        // Filter sellers
+        async function filterSellers() {
+            const status = document.getElementById('seller-status-filter').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/users/sellers`);
+                const data = await response.json();
+                
+                let filtered = data.data;
+                if (status) {
+                    filtered = filtered.filter(s => s.status === status);
+                }
+                
+                displaySellers(filtered);
+            } catch (error) {
+                showMessage('Failed to filter sellers', 'error');
+            }
+        }
+
+        // Approve seller
+        async function approveSeller(id) {
+            if (!confirm('Are you sure you want to approve this seller?')) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/users/sellers/${id}/approve`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('Seller approved successfully!', 'success');
+                    loadStats();
+                    loadPendingSellers();
+                    loadSellers();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Failed to approve seller', 'error');
+            }
+        }
+
+        // Deactivate seller
+        async function deactivateSeller(id) {
+            const reason = prompt('Enter reason for deactivation:');
+            if (!reason) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/users/sellers/${id}/deactivate`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('Seller deactivated successfully!', 'success');
+                    loadStats();
+                    loadPendingSellers();
+                    loadSellers();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Failed to deactivate seller', 'error');
+            }
+        }
+
+        // Load transaction statistics
+        async function loadTransactionStats() {
+            try {
+                const response = await fetch(`${API_URL}/transactions/stats`);
+                const data = await response.json();
+                
+                const statsHTML = `
+                    <div class="stat-card">
+                        <h3>Total Transactions</h3>
+                        <div class="value">${data.data.totalTransactions}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Completed</h3>
+                        <div class="value">${data.data.completedTransactions}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Revenue</h3>
+                        <div class="value">$${data.data.totalRevenue}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Net Revenue</h3>
+                        <div class="value">$${data.data.netRevenue}</div>
+                    </div>
+                `;
+                
+                document.getElementById('transaction-stats').innerHTML = statsHTML;
+            } catch (error) {
+                document.getElementById('transaction-stats').innerHTML = 
+                    '<div class="error">Failed to load statistics</div>';
+            }
+        }
+
+        // Load transactions
+        async function loadTransactions(page = 1) {
+            currentTransactionPage = page;
+            const status = document.getElementById('transaction-status-filter')?.value || '';
+            
+            try {
+                const response = await fetch(`${API_URL}/transactions?page=${page}&limit=10&status=${status}`);
+                const data = await response.json();
+                
+                displayTransactions(data.data);
+                displayTransactionPagination(data.pagination);
+            } catch (error) {
+                document.getElementById('transactions-container').innerHTML = 
+                    '<div class="error">Failed to load transactions</div>';
+            }
+        }
+
+        // Display transactions
+        function displayTransactions(transactions) {
+            if (transactions.length === 0) {
+                document.getElementById('transactions-container').innerHTML = 
+                    '<div class="empty-state">No transactions found</div>';
+                return;
+            }
+            
+            const tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Seller</th>
+                            <th>Buyer</th>
+                            <th>Product</th>
+                            <th>Amount</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${transactions.map(txn => `
+                            <tr>
+                                <td>${txn.id}</td>
+                                <td>${txn.sellerName}</td>
+                                <td>${txn.buyerName}</td>
+                                <td>${txn.productName}</td>
+                                <td>$${txn.amount.toFixed(2)}</td>
+                                <td>${txn.type}</td>
+                                <td><span class="status-badge status-${txn.status}">${txn.status}</span></td>
+                                <td>${new Date(txn.timestamp).toLocaleString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('transactions-container').innerHTML = tableHTML;
+        }
+
+        // Display transaction pagination
+        function displayTransactionPagination(pagination) {
+            const paginationHTML = `
+                <button onclick="loadTransactions(${pagination.currentPage - 1})" 
+                    ${pagination.currentPage === 1 ? 'disabled' : ''}>Previous</button>
+                <span>Page ${pagination.currentPage} of ${pagination.totalPages}</span>
+                <button onclick="loadTransactions(${pagination.currentPage + 1})" 
+                    ${pagination.currentPage === pagination.totalPages ? 'disabled' : ''}>Next</button>
+            `;
+            
+            document.getElementById('transaction-pagination').innerHTML = paginationHTML;
+        }
+
+        // Filter transactions
+        function filterTransactions() {
+            loadTransactions(1);
+        }
+
+        // Load activity logs
+        async function loadActivityLogs(page = 1) {
+            currentLogsPage = page;
+            const action = document.getElementById('log-action-filter')?.value || '';
+            
+            try {
+                const response = await fetch(`${API_URL}/transactions/logs?page=${page}&limit=20&action=${action}`);
+                const data = await response.json();
+                
+                displayLogs(data.data);
+                displayLogsPagination(data.pagination);
+            } catch (error) {
+                document.getElementById('logs-container').innerHTML = 
+                    '<div class="error">Failed to load activity logs</div>';
+            }
+        }
+
+        // Display logs
+        function displayLogs(logs) {
+            if (logs.length === 0) {
+                document.getElementById('logs-container').innerHTML = 
+                    '<div class="empty-state">No activity logs found</div>';
+                return;
+            }
+            
+            const tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                            <th>IP Address</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${logs.map(log => `
+                            <tr>
+                                <td>${log.userName}</td>
+                                <td>${log.action.replace(/_/g, ' ').toUpperCase()}</td>
+                                <td>${log.details || '-'}</td>
+                                <td>${log.ipAddress || '-'}</td>
+                                <td>${new Date(log.timestamp).toLocaleString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('logs-container').innerHTML = tableHTML;
+        }
+
+        // Display logs pagination
+        function displayLogsPagination(pagination) {
+            const paginationHTML = `
+                <button onclick="loadActivityLogs(${pagination.currentPage - 1})" 
+                    ${pagination.currentPage === 1 ? 'disabled' : ''}>Previous</button>
+                <span>Page ${pagination.currentPage} of ${pagination.totalPages}</span>
+                <button onclick="loadActivityLogs(${pagination.currentPage + 1})" 
+                    ${pagination.currentPage === pagination.totalPages ? 'disabled' : ''}>Next</button>
+            `;
+            
+            document.getElementById('logs-pagination').innerHTML = paginationHTML;
+        }
+
+        // Filter logs
+        function filterLogs() {
+            loadActivityLogs(1);
+        }
+    </script>
+</body>
+</html>
