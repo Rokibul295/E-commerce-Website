@@ -7,9 +7,14 @@ const products = [
 ];
 
 let cart = [];
+let orders = []; // Array to store orders
+let notifications = []; // Array to store notifications
 
 const listContainer = document.getElementById("product-list");
 const cartContainer = document.getElementById("cart");
+const checkoutButton = document.getElementById("checkout");
+const ordersContainer = document.getElementById("orders");
+const notificationsContainer = document.getElementById("notifications");
 
 const searchInput = document.getElementById("search");
 const categorySelect = document.getElementById("category");
@@ -65,6 +70,7 @@ function displayCart() {
 
     if (cart.length === 0) {
         cartContainer.innerHTML = "<p>Your cart is empty</p>";
+        checkoutButton.style.display = "none";
         return;
     }
 
@@ -77,10 +83,99 @@ function displayCart() {
         `;
         cartContainer.appendChild(div);
     });
+
+    checkoutButton.style.display = "block";
+}
+
+// Feature 1: Real-time order status (Pending, Shipped, Delivered)
+// We'll simulate status updates with timeouts for demonstration
+function checkout() {
+    if (cart.length === 0) return;
+
+    const orderId = orders.length + 1;
+    const order = {
+        id: orderId,
+        items: [...cart],
+        status: 'Pending',
+        createdAt: new Date().toLocaleString()
+    };
+
+    orders.push(order);
+    cart = []; // Clear cart after checkout
+    displayCart();
+    displayOrders();
+    notify(`Order #${orderId} placed and is now Pending.`);
+
+    // Simulate status updates
+    setTimeout(() => updateOrderStatus(orderId, 'Shipped'), 5000); // 5 seconds to Shipped
+    setTimeout(() => updateOrderStatus(orderId, 'Delivered'), 10000); // Another 5 seconds to Delivered
+}
+
+function updateOrderStatus(orderId, newStatus) {
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+        order.status = newStatus;
+        displayOrders();
+        notify(`Order #${orderId} updated to ${newStatus}.`);
+    }
+}
+
+function displayOrders() {
+    ordersContainer.innerHTML = "";
+
+    if (orders.length === 0) {
+        ordersContainer.innerHTML = "<p>No orders yet</p>";
+        return;
+    }
+
+    orders.forEach((order) => {
+        const div = document.createElement("div");
+        div.className = "order-item";
+        const itemsList = order.items.map(item => `${item.name} - ${item.price}৳`).join('<br>');
+        div.innerHTML = `
+            <span>Order #${order.id} - ${order.createdAt}</span>
+            <p>Items:<br>${itemsList}</p>
+            <p>Status: ${order.status}</p>
+        `;
+        ordersContainer.appendChild(div);
+    });
+}
+
+// Feature 2: Notify customers about order updates via email or dashboard
+// For email, we'll simulate with console.log (in real app, use EmailJS or backend)
+// For dashboard, add to notifications section
+function notify(message) {
+    // Simulate email notification
+    console.log(`Email sent: ${message}`); // In real app, integrate with email service
+
+    // Dashboard notification
+    notifications.push({ message, timestamp: new Date().toLocaleString() });
+    displayNotifications();
+}
+
+function displayNotifications() {
+    notificationsContainer.innerHTML = "";
+
+    if (notifications.length === 0) {
+        notificationsContainer.innerHTML = "<p>No notifications</p>";
+        return;
+    }
+
+    notifications.forEach((notif) => {
+        const div = document.createElement("div");
+        div.className = "notification-item";
+        div.innerHTML = `
+            <span>${notif.timestamp}: ${notif.message}</span>
+        `;
+        notificationsContainer.appendChild(div);
+    });
 }
 
 searchInput.addEventListener("input", displayProducts);
 categorySelect.addEventListener("change", displayProducts);
 priceRange.addEventListener("input", displayProducts);
+checkoutButton.addEventListener("click", checkout);
 
 displayProducts();
+displayOrders();
+displayNotifications();
