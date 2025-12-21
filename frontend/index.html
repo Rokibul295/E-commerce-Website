@@ -318,15 +318,15 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
+           
             table {
                 font-size: 12px;
             }
-            
+           
             th, td {
                 padding: 10px;
             }
-            
+           
             .btn {
                 padding: 6px 12px;
                 font-size: 12px;
@@ -348,6 +348,7 @@
             <button class="tab-btn" onclick="switchTab('sellers')">👥 Manage Sellers</button>
             <button class="tab-btn" onclick="switchTab('transactions')">💳 Transactions</button>
             <button class="tab-btn" onclick="switchTab('logs')">📋 Activity Logs</button>
+            <button class="tab-btn" onclick="window.location.href='reports.html'">📊 Reports & Export</button>
         </div>
 
         <div id="message-container"></div>
@@ -451,13 +452,13 @@
         function switchTab(tabName) {
             const tabs = document.querySelectorAll('.tab-content');
             const btns = document.querySelectorAll('.tab-btn');
-            
+           
             tabs.forEach(tab => tab.classList.remove('active'));
             btns.forEach(btn => btn.classList.remove('active'));
-            
+           
             document.getElementById(tabName).classList.add('active');
             event.target.classList.add('active');
-            
+           
             if (tabName === 'overview') {
                 loadStats();
                 loadPendingSellers();
@@ -482,7 +483,7 @@
             try {
                 const response = await fetch(`${API_URL}/users/stats`);
                 const data = await response.json();
-                
+               
                 const statsHTML = `
                     <div class="stat-card">
                         <h3>Total Sellers</h3>
@@ -501,10 +502,10 @@
                         <div class="value">${data.data.deactivatedSellers}</div>
                     </div>
                 `;
-                
+               
                 document.getElementById('stats-grid').innerHTML = statsHTML;
             } catch (error) {
-                document.getElementById('stats-grid').innerHTML = 
+                document.getElementById('stats-grid').innerHTML =
                     '<div class="error">Failed to load statistics</div>';
             }
         }
@@ -514,13 +515,13 @@
             try {
                 const response = await fetch(`${API_URL}/users/sellers/pending`);
                 const data = await response.json();
-                
+               
                 if (data.data.length === 0) {
-                    document.getElementById('pending-sellers-container').innerHTML = 
+                    document.getElementById('pending-sellers-container').innerHTML =
                         '<div class="empty-state">No pending sellers</div>';
                     return;
                 }
-                
+               
                 const tableHTML = `
                     <table>
                         <thead>
@@ -550,10 +551,10 @@
                         </tbody>
                     </table>
                 `;
-                
+               
                 document.getElementById('pending-sellers-container').innerHTML = tableHTML;
             } catch (error) {
-                document.getElementById('pending-sellers-container').innerHTML = 
+                document.getElementById('pending-sellers-container').innerHTML =
                     '<div class="error">Failed to load pending sellers</div>';
             }
         }
@@ -563,10 +564,10 @@
             try {
                 const response = await fetch(`${API_URL}/users/sellers`);
                 const data = await response.json();
-                
+               
                 displaySellers(data.data);
             } catch (error) {
-                document.getElementById('sellers-container').innerHTML = 
+                document.getElementById('sellers-container').innerHTML =
                     '<div class="error">Failed to load sellers</div>';
             }
         }
@@ -574,11 +575,11 @@
         // Display sellers
         function displaySellers(sellers) {
             if (sellers.length === 0) {
-                document.getElementById('sellers-container').innerHTML = 
+                document.getElementById('sellers-container').innerHTML =
                     '<div class="empty-state">No sellers found</div>';
                 return;
             }
-            
+           
             const tableHTML = `
                 <table>
                     <thead>
@@ -600,11 +601,11 @@
                                 <td>${new Date(seller.createdAt).toLocaleDateString()}</td>
                                 <td><span class="status-badge status-${seller.status}">${seller.status}</span></td>
                                 <td>
-                                    ${seller.status === 'pending' ? 
+                                    ${seller.status === 'pending' ?
                                         `<button class="btn btn-approve" onclick="approveSeller('${seller.id}')">Approve</button>` : ''}
-                                    ${seller.status === 'active' ? 
+                                    ${seller.status === 'active' ?
                                         `<button class="btn btn-deactivate" onclick="deactivateSeller('${seller.id}')">Deactivate</button>` : ''}
-                                    ${seller.status === 'deactivated' ? 
+                                    ${seller.status === 'deactivated' ?
                                         `<button class="btn btn-approve" onclick="approveSeller('${seller.id}')">Reactivate</button>` : ''}
                                 </td>
                             </tr>
@@ -612,23 +613,23 @@
                     </tbody>
                 </table>
             `;
-            
+           
             document.getElementById('sellers-container').innerHTML = tableHTML;
         }
 
         // Filter sellers
         async function filterSellers() {
             const status = document.getElementById('seller-status-filter').value;
-            
+           
             try {
                 const response = await fetch(`${API_URL}/users/sellers`);
                 const data = await response.json();
-                
+               
                 let filtered = data.data;
                 if (status) {
                     filtered = filtered.filter(s => s.status === status);
                 }
-                
+               
                 displaySellers(filtered);
             } catch (error) {
                 showMessage('Failed to filter sellers', 'error');
@@ -638,15 +639,15 @@
         // Approve seller
         async function approveSeller(id) {
             if (!confirm('Are you sure you want to approve this seller?')) return;
-            
+           
             try {
                 const response = await fetch(`${API_URL}/users/sellers/${id}/approve`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' }
                 });
-                
+               
                 const data = await response.json();
-                
+               
                 if (data.success) {
                     showMessage('Seller approved successfully!', 'success');
                     loadStats();
@@ -664,16 +665,16 @@
         async function deactivateSeller(id) {
             const reason = prompt('Enter reason for deactivation:');
             if (!reason) return;
-            
+           
             try {
                 const response = await fetch(`${API_URL}/users/sellers/${id}/deactivate`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ reason })
                 });
-                
+               
                 const data = await response.json();
-                
+               
                 if (data.success) {
                     showMessage('Seller deactivated successfully!', 'success');
                     loadStats();
@@ -692,7 +693,7 @@
             try {
                 const response = await fetch(`${API_URL}/transactions/stats`);
                 const data = await response.json();
-                
+               
                 const statsHTML = `
                     <div class="stat-card">
                         <h3>Total Transactions</h3>
@@ -711,10 +712,10 @@
                         <div class="value">$${data.data.netRevenue}</div>
                     </div>
                 `;
-                
+               
                 document.getElementById('transaction-stats').innerHTML = statsHTML;
             } catch (error) {
-                document.getElementById('transaction-stats').innerHTML = 
+                document.getElementById('transaction-stats').innerHTML =
                     '<div class="error">Failed to load statistics</div>';
             }
         }
@@ -723,15 +724,15 @@
         async function loadTransactions(page = 1) {
             currentTransactionPage = page;
             const status = document.getElementById('transaction-status-filter')?.value || '';
-            
+           
             try {
                 const response = await fetch(`${API_URL}/transactions?page=${page}&limit=10&status=${status}`);
                 const data = await response.json();
-                
+               
                 displayTransactions(data.data);
                 displayTransactionPagination(data.pagination);
             } catch (error) {
-                document.getElementById('transactions-container').innerHTML = 
+                document.getElementById('transactions-container').innerHTML =
                     '<div class="error">Failed to load transactions</div>';
             }
         }
@@ -739,11 +740,11 @@
         // Display transactions
         function displayTransactions(transactions) {
             if (transactions.length === 0) {
-                document.getElementById('transactions-container').innerHTML = 
+                document.getElementById('transactions-container').innerHTML =
                     '<div class="empty-state">No transactions found</div>';
                 return;
             }
-            
+           
             const tableHTML = `
                 <table>
                     <thead>
@@ -774,20 +775,20 @@
                     </tbody>
                 </table>
             `;
-            
+           
             document.getElementById('transactions-container').innerHTML = tableHTML;
         }
 
         // Display transaction pagination
         function displayTransactionPagination(pagination) {
             const paginationHTML = `
-                <button onclick="loadTransactions(${pagination.currentPage - 1})" 
+                <button onclick="loadTransactions(${pagination.currentPage - 1})"
                     ${pagination.currentPage === 1 ? 'disabled' : ''}>Previous</button>
                 <span>Page ${pagination.currentPage} of ${pagination.totalPages}</span>
-                <button onclick="loadTransactions(${pagination.currentPage + 1})" 
+                <button onclick="loadTransactions(${pagination.currentPage + 1})"
                     ${pagination.currentPage === pagination.totalPages ? 'disabled' : ''}>Next</button>
             `;
-            
+           
             document.getElementById('transaction-pagination').innerHTML = paginationHTML;
         }
 
@@ -800,15 +801,15 @@
         async function loadActivityLogs(page = 1) {
             currentLogsPage = page;
             const action = document.getElementById('log-action-filter')?.value || '';
-            
+           
             try {
                 const response = await fetch(`${API_URL}/transactions/logs?page=${page}&limit=20&action=${action}`);
                 const data = await response.json();
-                
+               
                 displayLogs(data.data);
                 displayLogsPagination(data.pagination);
             } catch (error) {
-                document.getElementById('logs-container').innerHTML = 
+                document.getElementById('logs-container').innerHTML =
                     '<div class="error">Failed to load activity logs</div>';
             }
         }
@@ -816,11 +817,11 @@
         // Display logs
         function displayLogs(logs) {
             if (logs.length === 0) {
-                document.getElementById('logs-container').innerHTML = 
+                document.getElementById('logs-container').innerHTML =
                     '<div class="empty-state">No activity logs found</div>';
                 return;
             }
-            
+           
             const tableHTML = `
                 <table>
                     <thead>
@@ -845,20 +846,20 @@
                     </tbody>
                 </table>
             `;
-            
+           
             document.getElementById('logs-container').innerHTML = tableHTML;
         }
 
         // Display logs pagination
         function displayLogsPagination(pagination) {
             const paginationHTML = `
-                <button onclick="loadActivityLogs(${pagination.currentPage - 1})" 
+                <button onclick="loadActivityLogs(${pagination.currentPage - 1})"
                     ${pagination.currentPage === 1 ? 'disabled' : ''}>Previous</button>
                 <span>Page ${pagination.currentPage} of ${pagination.totalPages}</span>
-                <button onclick="loadActivityLogs(${pagination.currentPage + 1})" 
+                <button onclick="loadActivityLogs(${pagination.currentPage + 1})"
                     ${pagination.currentPage === pagination.totalPages ? 'disabled' : ''}>Next</button>
             `;
-            
+           
             document.getElementById('logs-pagination').innerHTML = paginationHTML;
         }
 

@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports & Export - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .nav-links a {
+            padding: 10px 20px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid #667eea;
+        }
+
+        .nav-links a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+        }
+
+        .report-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .report-result.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-box h4 {
+            color: #667eea;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .stat-box .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 13px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .export-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .export-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .export-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .export-card h3 {
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .export-card p {
+            opacity: 0.9;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>📊 Reports & Data Export</h1>
+            <p>Generate comprehensive reports and export data</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="nav-links">
+            <a href="index.html">← Back to Dashboard</a>
+        </div>
+
+        <div id="message-container"></div>
+
+        <!-- Sales Report Section -->
+        <div class="card">
+            <h2>📈 Sales Report</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" id="sales-start-date">
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" id="sales-end-date">
+                </div>
+                <div class="form-group">
+                    <label>Seller (Optional)</label>
+                    <select id="sales-seller">
+                        <option value="">All Sellers</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="generateSalesReport()">Generate Sales Report</button>
+            
+            <div id="sales-report-result" class="report-result">
+                <div class="loading">Generating report...</div>
+            </div>
+        </div>
+
+        <!-- User Activity Report Section -->
+        <div class="card">
+            <h2>👤 User Activity Report</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" id="activity-start-date">
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" id="activity-end-date">
+                </div>
+                <div class="form-group">
+                    <label>Action Type (Optional)</label>
+                    <select id="activity-action">
+                        <option value="">All Actions</option>
+                        <option value="login">Login</option>
+                        <option value="approved_seller">Approved Seller</option>
+                        <option value="deactivated_seller">Deactivated Seller</option>
+                        <option value="created_product">Created Product</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="generateActivityReport()">Generate Activity Report</button>
+            
+            <div id="activity-report-result" class="report-result">
+                <div class="loading">Generating report...</div>
+            </div>
+        </div>
+
+        <!-- Comprehensive Report Section -->
+        <div class="card">
+            <h2>📑 Comprehensive System Report</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Start Date (Optional)</label>
+                    <input type="date" id="comp-start-date">
+                </div>
+                <div class="form-group">
+                    <label>End Date (Optional)</label>
+                    <input type="date" id="comp-end-date">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="generateComprehensiveReport()">Generate Comprehensive Report</button>
+            
+            <div id="comp-report-result" class="report-result">
+                <div class="loading">Generating report...</div>
+            </div>
+        </div>
+
+        <!-- Data Export Section -->
+        <div class="card">
+            <h2>💾 Data Export & Backup</h2>
+            <div class="export-section">
+                <div class="export-card" onclick="exportData('users')">
+                    <h3>👥 Export Users</h3>
+                    <p>Download all user data</p>
+                    <button class="btn btn-success">Export JSON</button>
+                    <button class="btn btn-warning" onclick="event.stopPropagation(); exportData('users', 'csv')">Export CSV</button>
+                </div>
+                
+                <div class="export-card" onclick="exportData('transactions')">
+                    <h3>💳 Export Transactions</h3>
+                    <p>Download transaction history</p>
+                    <button class="btn btn-success">Export JSON</button>
+                    <button class="btn btn-warning" onclick="event.stopPropagation(); exportData('transactions', 'csv')">Export CSV</button>
+                </div>
+                
+                <div class="export-card" onclick="exportData('logs')">
+                    <h3>📋 Export Activity Logs</h3>
+                    <p>Download activity log data</p>
+                    <button class="btn btn-success">Export JSON</button>
+                    <button class="btn btn-warning" onclick="event.stopPropagation(); exportData('logs', 'csv')">Export CSV</button>
+                </div>
+                
+                <div class="export-card" onclick="backupAllData()">
+                    <h3>🔐 Full System Backup</h3>
+                    <p>Backup entire database</p>
+                    <button class="btn btn-success">Create Backup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        // Load sellers for dropdown
+        window.onload = async () => {
+            try {
+                const response = await fetch(`${API_URL}/users/sellers`);
+                const data = await response.json();
+                
+                const select = document.getElementById('sales-seller');
+                data.data.forEach(seller => {
+                    const option = document.createElement('option');
+                    option.value = seller.id;
+                    option.textContent = seller.name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Failed to load sellers');
+            }
+        };
+
+        // Show message
+        function showMessage(message, type = 'success') {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => container.innerHTML = '', 5000);
+        }
+
+        // Generate Sales Report
+        async function generateSalesReport() {
+            const startDate = document.getElementById('sales-start-date').value;
+            const endDate = document.getElementById('sales-end-date').value;
+            const sellerId = document.getElementById('sales-seller').value;
+            
+            if (!startDate || !endDate) {
+                showMessage('Please select start and end dates', 'error');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('sales-report-result');
+            resultDiv.classList.add('active');
+            resultDiv.innerHTML = '<div class="loading">Generating report...</div>';
+            
+            try {
+                const url = `${API_URL}/reports/sales?startDate=${startDate}&endDate=${endDate}${sellerId ? '&sellerId=' + sellerId : ''}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displaySalesReport(data.data);
+                    showMessage('Sales report generated successfully!', 'success');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">Failed to generate report</div>';
+                showMessage('Failed to generate sales report', 'error');
+            }
+        }
+
+        // Display Sales Report
+        function displaySalesReport(data) {
+            const resultDiv = document.getElementById('sales-report-result');
+            
+            const html = `
+                <h3>Sales Report Summary</h3>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h4>Total Sales</h4>
+                        <div class="value">${data.summary.totalSales}</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Completed Sales</h4>
+                        <div class="value">${data.summary.completedSales}</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Total Revenue</h4>
+                        <div class="value">$${data.summary.totalRevenue}</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Net Revenue</h4>
+                        <div class="value">$${data.summary.netRevenue}</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Average Order Value</h4>
+                        <div class="value">$${data.summary.averageOrderValue}</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Total Refunds</h4>
+                        <div class="value">${data.summary.totalRefunds}</div>
+                    </div>
+                </div>
+                
+                <h3>Sales by Seller</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Seller Name</th>
+                            <th>Total Sales</th>
+                            <th>Transactions</th>
+                            <th>Total Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.salesBySeller.map(seller => `
+                            <tr>
+                                <td>${seller.sellerName}</td>
+                                <td>${seller.totalSales}</td>
+                                <td>${seller.transactions}</td>
+                                <td>$${seller.totalRevenue.toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <h3>Sales by Product</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Quantity Sold</th>
+                            <th>Total Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.salesByProduct.map(product => `
+                            <tr>
+                                <td>${product.productName}</td>
+                                <td>${product.quantitySold}</td>
+                                <td>$${product.totalRevenue.toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <p><small>Report generated at: ${new Date(data.reportGeneratedAt).toLocaleString()}</small></p>
+            `;
+            
+            resultDiv.innerHTML = html;
+        }
+
+        // Generate Activity Report
+        async function generateActivityReport() {
+            const startDate = document.getElementById('activity-start-date').value;
+            const endDate = document.getElementById('activity-end-date').value;
+            const action = document.getElementById('activity-action').value;
+            
+            if (!startDate || !endDate) {
+                showMessage('Please select start and end dates', 'error');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('activity-report-result');
+            resultDiv.classList.add('active');
+            resultDiv.innerHTML = '<div class="loading">Generating report...</div>';
+            
+            try {
+                const url = `${API_URL}/reports/user-activity?startDate=${startDate}&endDate=${endDate}${action ? '&action=' + action : ''}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayActivityReport(data.data);
+                    showMessage('Activity report generated successfully!', 'success');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">Failed to generate report</div>';
+                showMessage('Failed to generate activity report', 'error');
+            }
+        }
+
+        // Display Activity Report
+        function displayActivityReport(data) {
+            const resultDiv = document.getElementById('activity-report-result');
+            
+            const html = `
+                <h3>Activity Report Summary</h3>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h4>Total Activities</h4>
+                        <div class="value">${data.summary.totalActivities}</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Unique Users</h4>
+                        <div class="value">${data.summary.uniqueUsers}</div>
+                    </div>
+                </div>
+                
+                <h3>Activities by Action Type</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Action Type</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.activitiesByAction.map(action => `
+                            <tr>
+                                <td>${action.action.replace(/_/g, ' ').toUpperCase()}</td>
+                                <td>${action.count}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <h3>Most Active Users</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User Name</th>
+                            <th>Total Activities</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.mostActiveUsers.map(user => `
+                            <tr>
+                                <td>${user.userName}</td>
+                                <td>${user.totalActivities}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <p><small>Report generated at: ${new Date(data.reportGeneratedAt).toLocaleString()}</small></p>
+            `;
+            
+            resultDiv.innerHTML = html;
+        }
+
+        // Generate Comprehensive Report
+        async function generateComprehensiveReport() {
+            const startDate = document.getElementById('comp-start-date').value;
+            const endDate = document.getElementById('comp-end-date').value;
+            
+            const resultDiv = document.getElementById('comp-report-result');
+            resultDiv.classList.add('active');
+            resultDiv.innerHTML = '<div class="loading">Generating report...</div>';
+            
+            try {
+                const url = `${API_URL}/reports/comprehensive${startDate && endDate ? `?startDate=${startDate}&endDate=${endDate}` : ''}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayComprehensiveReport(data.data);
+                    showMessage('Comprehensive report generated successfully!', 'success');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">Failed to generate report</div>';
+                showMessage('Failed to generate comprehensive report', 'error');
+            }
+        }
+
+        // Display Comprehensive Report
+        function displayComprehensiveReport(data) {
+            const resultDiv = document.getElementById('comp-report-result');
+            
+            const html = `
+                <h3>System Overview</h3>
+                
+                <h4>User Metrics</h4>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h4>Total Sellers</h4>
+                        <div class="value">${data.userMetrics.totalSellers}</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Active Sellers</h4>
+                        <div class="value">${data.userMetrics.activeSellers}</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Pending Sellers</h4>
+                        <div class="value">${data.userMetrics.pendingSellers}</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Deactivated Sellers</h4>
+                        <div class="value">${data.userMetrics.deactivatedSellers}</div>
+                    </div>
+                </div>
+                
+                <h4>Transaction Metrics</h4>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h4>Total Transactions</h4>
+                        <div class="value">${data.transactionMetrics.totalTransactions}</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Completed</h4>
+                        <div class="value">${data.transactionMetrics.completedTransactions}</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Pending</h4>
+                        <div class="value">${data.transactionMetrics.pendingTransactions}</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Total Revenue</h4>
+                        <div class="value">$${data.transactionMetrics.totalRevenue}</div>
+                    </div>
+                </div>
+                
+                <h4>Activity Metrics</h4>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h4>Total Activities</h4>
+                        <div class="value">${data.activityMetrics.totalActivities}</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Unique Users</h4>
+                        <div class="value">${data.activityMetrics.uniqueUsers}</div>
+                    </div>
+                </div>
+                
+                <p><small>Report generated at: ${new Date(data.reportGeneratedAt).toLocaleString()}</small></p>
+            `;
+            
+            resultDiv.innerHTML = html;
+        }
+
+        // Export Data
+        async function exportData(type, format = 'json') {
+            try {
+                const endpoints = {
+                    'users': 'users',
+                    'transactions': 'transactions',
+                    'logs': 'logs'
+                };
+                
+                const url = `${API_URL}/export/${endpoints[type]}?format=${format}`;
+                
+                if (format === 'csv') {
+                    window.open(url, '_blank');
+                    showMessage(`${type} exported as CSV successfully!`, 'success');
+                } else {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const downloadUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = `${type}_export.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(downloadUrl);
+                    
+                    showMessage(`${type} exported successfully!`, 'success');
+                }
+            } catch (error) {
+                showMessage(`Failed to export ${type}`, 'error');
+            }
+        }
+
+        // Backup All Data
+        async function backupAllData() {
+            try {
+                const response = await fetch(`${API_URL}/export/backup`);
+                const data = await response.json();
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `system_backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showMessage('System backup created successfully!', 'success');
+            } catch (error) {
+                showMessage('Failed to create backup', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
