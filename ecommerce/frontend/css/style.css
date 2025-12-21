@@ -1,0 +1,134 @@
+/* ---------------- BODY ---------------- */
+body {
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f3f6fa;
+  color: #333;
+}
+
+/* ---------------- HEADER ---------------- */
+h1 {
+  text-align: center;
+  padding: 20px;
+  background: #3B82F6;
+  color: white;
+  margin: 0;
+  font-size: 28px;
+}
+
+/* ---------------- PRODUCT CARDS ---------------- */
+.product-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  margin: 15px;
+  padding: 10px;
+  width: 200px;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+}
+
+.product-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.product-card h3 {
+  margin: 10px 0 5px 0;
+  font-size: 18px;
+}
+
+.product-card p {
+  margin: 5px 0;
+}
+
+/* ---------------- BUTTONS ---------------- */
+button {
+  background: #3B82F6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #1e60c9;
+}
+
+/* ---------------- CART ---------------- */
+#cart {
+  max-width: 600px;
+  margin: 20px auto;
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+/* ---------------- ORDERS ---------------- */
+#orders {
+  max-width: 600px;
+  margin: 20px auto;
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.order-item {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+/* ---------------- REVIEWS ---------------- */
+.review-item {
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  padding: 8px;
+}
+
+/* ---------------- NOTIFICATIONS ---------------- */
+#notifications {
+  max-width: 600px;
+  margin: 20px auto;
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.notification-item {
+  border-bottom: 1px solid #eee;
+  padding: 5px 0;
+  font-size: 14px;
+}
+
+/* ---------------- GENERAL ---------------- */
+#checkout {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  font-size: 16px;
+}
