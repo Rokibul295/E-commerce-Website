@@ -14,25 +14,48 @@ A full-stack e-commerce application built with MongoDB, Express, React, and Node
 ## Tech Stack
 
 - **Frontend**: React, React Router, Axios
-- **Backend**: Node.js, Express
+- **Backend**: Node.js, Express (MVC Architecture)
 - **Database**: MongoDB with Mongoose
 - **Authentication**: JWT (JSON Web Tokens)
 
-## Project Structure
+## Architecture
+
+This project follows the **MVC (Model-View-Controller)** pattern:
+
+- **Models**: Define data structures and database schemas (`server/models/`)
+- **Controllers**: Handle business logic and request processing (`server/controllers/`)
+- **Routes**: Define API endpoints and connect them to controllers (`server/routes/`)
+- **Views**: React components handle the presentation layer (`client/src/components/`)
+
+## Project Structure (MVC Architecture)
 
 ```
 E-commerce-Website/
-├── client/                 # React frontend
+├── client/                 # React frontend (View Layer)
 │   ├── public/
 │   ├── src/
 │   │   ├── components/     # React components
 │   │   ├── context/        # Context API (Auth)
 │   │   └── App.js
 │   └── package.json
-├── server/                 # Express backend
-│   ├── models/            # MongoDB models
-│   ├── routes/            # API routes
-│   ├── middleware/        # Auth middleware
+├── server/                 # Express backend (MVC)
+│   ├── models/            # Models (Data Layer)
+│   │   ├── User.js
+│   │   ├── Product.js
+│   │   ├── Cart.js
+│   │   └── Order.js
+│   ├── controllers/       # Controllers (Business Logic Layer)
+│   │   ├── authController.js
+│   │   ├── productController.js
+│   │   ├── cartController.js
+│   │   └── orderController.js
+│   ├── routes/            # Routes (API Endpoints)
+│   │   ├── auth.js
+│   │   ├── products.js
+│   │   ├── cart.js
+│   │   └── orders.js
+│   ├── middleware/        # Middleware
+│   │   └── auth.js
 │   ├── server.js          # Entry point
 │   └── package.json
 └── README.md
