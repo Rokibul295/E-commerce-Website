@@ -11,7 +11,7 @@ fi
 
 # Start backend in background
 echo "📦 Starting backend server on port 5002..."
-cd server
+cd backend
 npm run dev > ../backend.log 2>&1 &
 BACKEND_PID=$!
 cd ..
@@ -21,7 +21,7 @@ sleep 3
 
 # Start frontend
 echo "⚛️  Starting frontend on port 3000..."
-cd client
+cd frontend
 npm start > ../frontend.log 2>&1 &
 FRONTEND_PID=$!
 cd ..

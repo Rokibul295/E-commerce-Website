@@ -22,23 +22,23 @@ A full-stack e-commerce application built with MongoDB, Express, React, and Node
 
 This project follows the **MVC (Model-View-Controller)** pattern:
 
-- **Models**: Define data structures and database schemas (`server/models/`)
-- **Controllers**: Handle business logic and request processing (`server/controllers/`)
-- **Routes**: Define API endpoints and connect them to controllers (`server/routes/`)
-- **Views**: React components handle the presentation layer (`client/src/components/`)
+- **Models**: Define data structures and database schemas (`backend/models/`)
+- **Controllers**: Handle business logic and request processing (`backend/controllers/`)
+- **Routes**: Define API endpoints and connect them to controllers (`backend/routes/`)
+- **Views**: React components handle the presentation layer (`frontend/src/components/`)
 
 ## Project Structure (MVC Architecture)
 
 ```
 E-commerce-Website/
-├── client/                 # React frontend (View Layer)
+├── frontend/              # React frontend (View Layer)
 │   ├── public/
 │   ├── src/
 │   │   ├── components/     # React components
 │   │   ├── context/        # Context API (Auth)
 │   │   └── App.js
 │   └── package.json
-├── server/                 # Express backend (MVC)
+├── backend/               # Express backend (MVC)
 │   ├── models/            # Models (Data Layer)
 │   │   ├── User.js
 │   │   ├── Product.js
@@ -78,19 +78,19 @@ E-commerce-Website/
 
 2. **Install Backend Dependencies**
    ```bash
-   cd server
+   cd backend
    npm install
    ```
 
 3. **Install Frontend Dependencies**
    ```bash
-   cd ../client
+   cd ../frontend
    npm install
    ```
 
 4. **Configure Environment Variables**
 
-   Create a `.env` file in the `server` directory:
+   Create a `.env` file in the `backend` directory:
    ```env
    PORT=5000
    MONGODB_URI=mongodb://localhost:27017/ecommerce
@@ -104,20 +104,20 @@ E-commerce-Website/
 
 6. **Seed the Database** (Optional)
    ```bash
-   cd server
+   cd backend
    node seed.js
    ```
 
 7. **Start the Backend Server**
    ```bash
-   cd server
+   cd backend
    npm run dev
    ```
    The server will run on `http://localhost:5002`
 
 8. **Start the Frontend** (in a new terminal)
    ```bash
-   cd client
+   cd frontend
    npm start
    ```
    The React app will open in your browser at `http://localhost:3000`
@@ -187,7 +187,7 @@ start http://localhost:3000
 
 ### Build Frontend
 ```bash
-cd client
+cd frontend
 npm run build
 ```
 
