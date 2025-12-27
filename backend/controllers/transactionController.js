@@ -1,113 +1,122 @@
-const { transactions, activityLogs } = require('../mockData');
+const Transaction = require('../models/Transaction');
+const ActivityLog = require('../models/ActivityLog');
 
 // Get all transactions
-exports.getAllTransactions = (req, res) => {
-  const { page = 1, limit = 10, status, sellerId } = req.query;
-  
-  let filteredTransactions = [...transactions];
-  
-  // Filter by status
-  if (status) {
-    filteredTransactions = filteredTransactions.filter(t => t.status === status);
+exports.getAllTransactions = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, status, sellerId } = req.query;
+    
+    const query = {};
+    if (status) query.status = status;
+    if (sellerId) query.sellerId = sellerId;
+    
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    const transactions = await Transaction.find(query)
+      .sort({ timestamp: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+    
+    const totalItems = await Transaction.countDocuments(query);
+    
+    res.json({
+      success: true,
+      data: transactions,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(totalItems / parseInt(limit)),
+        totalItems,
+        itemsPerPage: parseInt(limit)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
-  
-  // Filter by seller
-  if (sellerId) {
-    filteredTransactions = filteredTransactions.filter(t => t.sellerId === sellerId);
-  }
-  
-  // Sort by timestamp (newest first)
-  filteredTransactions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  
-  // Pagination
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + parseInt(limit);
-  const paginatedTransactions = filteredTransactions.slice(startIndex, endIndex);
-  
-  res.json({
-    success: true,
-    data: paginatedTransactions,
-    pagination: {
-      currentPage: parseInt(page),
-      totalPages: Math.ceil(filteredTransactions.length / limit),
-      totalItems: filteredTransactions.length,
-      itemsPerPage: parseInt(limit)
-    }
-  });
 };
 
 // Get transaction by ID
-exports.getTransactionById = (req, res) => {
-  const { id } = req.params;
-  
-  const transaction = transactions.find(t => t.id === id);
-  
-  if (!transaction) {
-    return res.status(404).json({ success: false, message: 'Transaction not found' });
+exports.getTransactionById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const transaction = await Transaction.findById(id);
+    
+    if (!transaction) {
+      return res.status(404).json({ success: false, message: 'Transaction not found' });
+    }
+    
+    res.json({ success: true, data: transaction });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
-  
-  res.json({ success: true, data: transaction });
 };
 
 // Get transaction statistics
-exports.getTransactionStats = (req, res) => {
-  const totalTransactions = transactions.length;
-  const completedTransactions = transactions.filter(t => t.status === 'completed').length;
-  const pendingTransactions = transactions.filter(t => t.status === 'pending').length;
-  
-  const totalRevenue = transactions
-    .filter(t => t.status === 'completed' && t.type === 'sale')
-    .reduce((sum, t) => sum + t.amount, 0);
-  
-  const totalRefunds = transactions
-    .filter(t => t.status === 'completed' && t.type === 'refund')
-    .reduce((sum, t) => sum + t.amount, 0);
-  
-  res.json({
-    success: true,
-    data: {
-      totalTransactions,
-      completedTransactions,
-      pendingTransactions,
-      totalRevenue: totalRevenue.toFixed(2),
-      totalRefunds: totalRefunds.toFixed(2),
-      netRevenue: (totalRevenue - totalRefunds).toFixed(2)
-    }
-  });
+exports.getTransactionStats = async (req, res) => {
+  try {
+    const totalTransactions = await Transaction.countDocuments();
+    const completedTransactions = await Transaction.countDocuments({ status: 'completed' });
+    const pendingTransactions = await Transaction.countDocuments({ status: 'pending' });
+    
+    const revenueData = await Transaction.aggregate([
+      { $match: { status: 'completed', type: 'sale' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+    
+    const refundData = await Transaction.aggregate([
+      { $match: { status: 'completed', type: 'refund' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+    
+    const totalRevenue = revenueData[0]?.total || 0;
+    const totalRefunds = refundData[0]?.total || 0;
+    const netRevenue = totalRevenue - totalRefunds;
+    
+    res.json({
+      success: true,
+      data: {
+        totalTransactions,
+        completedTransactions,
+        pendingTransactions,
+        totalRevenue: totalRevenue.toFixed(2),
+        totalRefunds: totalRefunds.toFixed(2),
+        netRevenue: netRevenue.toFixed(2)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 // Get activity logs
-exports.getActivityLogs = (req, res) => {
-  const { page = 1, limit = 20, userId, action } = req.query;
-  
-  let filteredLogs = [...activityLogs];
-  
-  // Filter by user
-  if (userId) {
-    filteredLogs = filteredLogs.filter(log => log.userId === userId);
+exports.getActivityLogs = async (req, res) => {
+  try {
+    const { page = 1, limit = 20, userId, action } = req.query;
+    
+    const query = {};
+    if (userId) query.userId = userId;
+    if (action) query.action = action;
+    
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    const logs = await ActivityLog.find(query)
+      .sort({ timestamp: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+    
+    const totalItems = await ActivityLog.countDocuments(query);
+    
+    res.json({
+      success: true,
+      data: logs,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(totalItems / parseInt(limit)),
+        totalItems,
+        itemsPerPage: parseInt(limit)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
-  
-  // Filter by action
-  if (action) {
-    filteredLogs = filteredLogs.filter(log => log.action === action);
-  }
-  
-  // Sort by timestamp (newest first)
-  filteredLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  
-  // Pagination
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + parseInt(limit);
-  const paginatedLogs = filteredLogs.slice(startIndex, endIndex);
-  
-  res.json({
-    success: true,
-    data: paginatedLogs,
-    pagination: {
-      currentPage: parseInt(page),
-      totalPages: Math.ceil(filteredLogs.length / limit),
-      totalItems: filteredLogs.length,
-      itemsPerPage: parseInt(limit)
-    }
-  });
 };

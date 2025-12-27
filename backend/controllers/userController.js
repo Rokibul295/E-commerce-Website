@@ -1,100 +1,120 @@
-const { users, activityLogs } = require('../mockData');
+const User = require('../models/User');
+const ActivityLog = require('../models/ActivityLog');
 
 // Get all sellers
-exports.getAllSellers = (req, res) => {
-  const sellers = users.filter(user => user.role === 'seller');
-  res.json({ success: true, data: sellers });
+exports.getAllSellers = async (req, res) => {
+  try {
+    const sellers = await User.find({ role: 'seller' }).sort({ createdAt: -1 });
+    res.json({ success: true, data: sellers });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 // Get pending sellers
-exports.getPendingSellers = (req, res) => {
-  const pendingSellers = users.filter(
-    user => user.role === 'seller' && user.status === 'pending'
-  );
-  res.json({ success: true, data: pendingSellers });
+exports.getPendingSellers = async (req, res) => {
+  try {
+    const pendingSellers = await User.find({ 
+      role: 'seller', 
+      status: 'pending' 
+    }).sort({ createdAt: -1 });
+    res.json({ success: true, data: pendingSellers });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 // Approve seller account
-exports.approveSeller = (req, res) => {
-  const { id } = req.params;
-  
-  const userIndex = users.findIndex(user => user.id === id);
-  
-  if (userIndex === -1) {
-    return res.status(404).json({ success: false, message: 'Seller not found' });
+exports.approveSeller = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const user = await User.findById(id);
+    
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Seller not found' });
+    }
+    
+    if (user.role !== 'seller') {
+      return res.status(400).json({ success: false, message: 'User is not a seller' });
+    }
+    
+    user.status = 'active';
+    await user.save();
+    
+    // Add activity log
+    await ActivityLog.create({
+      userId: id,
+      userName: 'Admin User',
+      action: 'approved_seller',
+      details: `Approved seller: ${user.name}`
+    });
+    
+    res.json({ 
+      success: true, 
+      message: 'Seller approved successfully',
+      data: user
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
-  
-  if (users[userIndex].role !== 'seller') {
-    return res.status(400).json({ success: false, message: 'User is not a seller' });
-  }
-  
-  users[userIndex].status = 'active';
-  
-  // Add activity log
-  activityLogs.push({
-    id: `log${activityLogs.length + 1}`,
-    userId: '3',
-    userName: 'Admin User',
-    action: 'approved_seller',
-    timestamp: new Date(),
-    details: `Approved seller: ${users[userIndex].name}`
-  });
-  
-  res.json({ 
-    success: true, 
-    message: 'Seller approved successfully',
-    data: users[userIndex]
-  });
 };
 
 // Deactivate seller account
-exports.deactivateSeller = (req, res) => {
-  const { id } = req.params;
-  const { reason } = req.body;
-  
-  const userIndex = users.findIndex(user => user.id === id);
-  
-  if (userIndex === -1) {
-    return res.status(404).json({ success: false, message: 'Seller not found' });
+exports.deactivateSeller = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    
+    const user = await User.findById(id);
+    
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Seller not found' });
+    }
+    
+    if (user.role !== 'seller') {
+      return res.status(400).json({ success: false, message: 'User is not a seller' });
+    }
+    
+    user.status = 'deactivated';
+    await user.save();
+    
+    // Add activity log
+    await ActivityLog.create({
+      userId: id,
+      userName: 'Admin User',
+      action: 'deactivated_seller',
+      details: `Deactivated seller: ${user.name}. Reason: ${reason || 'Not specified'}`
+    });
+    
+    res.json({ 
+      success: true, 
+      message: 'Seller deactivated successfully',
+      data: user
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
-  
-  if (users[userIndex].role !== 'seller') {
-    return res.status(400).json({ success: false, message: 'User is not a seller' });
-  }
-  
-  users[userIndex].status = 'deactivated';
-  
-  // Add activity log
-  activityLogs.push({
-    id: `log${activityLogs.length + 1}`,
-    userId: '3',
-    userName: 'Admin User',
-    action: 'deactivated_seller',
-    timestamp: new Date(),
-    details: `Deactivated seller: ${users[userIndex].name}. Reason: ${reason || 'Not specified'}`
-  });
-  
-  res.json({ 
-    success: true, 
-    message: 'Seller deactivated successfully',
-    data: users[userIndex]
-  });
 };
 
 // Get user statistics
-exports.getUserStats = (req, res) => {
-  const totalSellers = users.filter(u => u.role === 'seller').length;
-  const activeSellers = users.filter(u => u.role === 'seller' && u.status === 'active').length;
-  const pendingSellers = users.filter(u => u.role === 'seller' && u.status === 'pending').length;
-  const deactivatedSellers = users.filter(u => u.role === 'seller' && u.status === 'deactivated').length;
-  
-  res.json({
-    success: true,
-    data: {
-      totalSellers,
-      activeSellers,
-      pendingSellers,
-      deactivatedSellers
-    }
-  });
+exports.getUserStats = async (req, res) => {
+  try {
+    const totalSellers = await User.countDocuments({ role: 'seller' });
+    const activeSellers = await User.countDocuments({ role: 'seller', status: 'active' });
+    const pendingSellers = await User.countDocuments({ role: 'seller', status: 'pending' });
+    const deactivatedSellers = await User.countDocuments({ role: 'seller', status: 'deactivated' });
+    
+    res.json({
+      success: true,
+      data: {
+        totalSellers,
+        activeSellers,
+        pendingSellers,
+        deactivatedSellers
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };

@@ -1,154 +1,186 @@
-const { users, transactions, activityLogs } = require('../mockData');
+const User = require('../models/User');
+const Transaction = require('../models/Transaction');
+const ActivityLog = require('../models/ActivityLog');
 
 // Export Users Data
-exports.exportUsers = (req, res) => {
-  const { format = 'json' } = req.query;
-  
-  const exportData = {
-    exportDate: new Date().toISOString(),
-    totalRecords: users.length,
-    data: users
-  };
-  
-  if (format === 'csv') {
-    const csv = convertToCSV(users, ['id', 'name', 'email', 'role', 'status', 'phone', 'createdAt']);
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=users_export.csv');
-    return res.send(csv);
+exports.exportUsers = async (req, res) => {
+  try {
+    const { format = 'json' } = req.query;
+    
+    const users = await User.find({});
+    
+    const exportData = {
+      exportDate: new Date().toISOString(),
+      totalRecords: users.length,
+      data: users
+    };
+    
+    if (format === 'csv') {
+      const csv = convertToCSV(users, ['_id', 'name', 'email', 'role', 'status', 'phone', 'createdAt']);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename=users_export.csv');
+      return res.send(csv);
+    }
+    
+    res.json({
+      success: true,
+      ...exportData
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
-  
-  res.json({
-    success: true,
-    ...exportData
-  });
 };
 
 // Export Transactions Data
-exports.exportTransactions = (req, res) => {
-  const { format = 'json', startDate, endDate } = req.query;
-  
-  let filteredTransactions = [...transactions];
-  
-  if (startDate && endDate) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    filteredTransactions = filteredTransactions.filter(t => {
-      const txnDate = new Date(t.timestamp);
-      return txnDate >= start && txnDate <= end;
+exports.exportTransactions = async (req, res) => {
+  try {
+    const { format = 'json', startDate, endDate } = req.query;
+    
+    const query = {};
+    if (startDate && endDate) {
+      query.timestamp = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      };
+    }
+    
+    const transactions = await Transaction.find(query).sort({ timestamp: -1 });
+    
+    const exportData = {
+      exportDate: new Date().toISOString(),
+      totalRecords: transactions.length,
+      filters: { startDate, endDate },
+      data: transactions
+    };
+    
+    if (format === 'csv') {
+      const csv = convertToCSV(transactions, 
+        ['_id', 'sellerId', 'sellerName', 'buyerName', 'amount', 'type', 'status', 'timestamp', 'productName']);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename=transactions_export.csv');
+      return res.send(csv);
+    }
+    
+    res.json({
+      success: true,
+      ...exportData
     });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
-  
-  const exportData = {
-    exportDate: new Date().toISOString(),
-    totalRecords: filteredTransactions.length,
-    filters: { startDate, endDate },
-    data: filteredTransactions
-  };
-  
-  if (format === 'csv') {
-    const csv = convertToCSV(filteredTransactions, 
-      ['id', 'sellerId', 'sellerName', 'buyerName', 'amount', 'type', 'status', 'timestamp', 'productName']);
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=transactions_export.csv');
-    return res.send(csv);
-  }
-  
-  res.json({
-    success: true,
-    ...exportData
-  });
 };
 
 // Export Activity Logs
-exports.exportActivityLogs = (req, res) => {
-  const { format = 'json', startDate, endDate } = req.query;
-  
-  let filteredLogs = [...activityLogs];
-  
-  if (startDate && endDate) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    filteredLogs = filteredLogs.filter(log => {
-      const logDate = new Date(log.timestamp);
-      return logDate >= start && logDate <= end;
+exports.exportActivityLogs = async (req, res) => {
+  try {
+    const { format = 'json', startDate, endDate } = req.query;
+    
+    const query = {};
+    if (startDate && endDate) {
+      query.timestamp = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      };
+    }
+    
+    const logs = await ActivityLog.find(query).sort({ timestamp: -1 });
+    
+    const exportData = {
+      exportDate: new Date().toISOString(),
+      totalRecords: logs.length,
+      filters: { startDate, endDate },
+      data: logs
+    };
+    
+    if (format === 'csv') {
+      const csv = convertToCSV(logs, 
+        ['_id', 'userId', 'userName', 'action', 'timestamp', 'ipAddress', 'details']);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename=activity_logs_export.csv');
+      return res.send(csv);
+    }
+    
+    res.json({
+      success: true,
+      ...exportData
     });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
-  
-  const exportData = {
-    exportDate: new Date().toISOString(),
-    totalRecords: filteredLogs.length,
-    filters: { startDate, endDate },
-    data: filteredLogs
-  };
-  
-  if (format === 'csv') {
-    const csv = convertToCSV(filteredLogs, 
-      ['id', 'userId', 'userName', 'action', 'timestamp', 'ipAddress', 'details']);
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=activity_logs_export.csv');
-    return res.send(csv);
-  }
-  
-  res.json({
-    success: true,
-    ...exportData
-  });
 };
 
 // Backup All Data
-exports.backupAllData = (req, res) => {
-  const backupData = {
-    backupDate: new Date().toISOString(),
-    version: '1.0',
-    data: {
-      users: users,
-      transactions: transactions,
-      activityLogs: activityLogs
-    },
-    metadata: {
-      totalUsers: users.length,
-      totalTransactions: transactions.length,
-      totalLogs: activityLogs.length
-    }
-  };
-  
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Content-Disposition', 'attachment; filename=system_backup.json');
-  res.json(backupData);
+exports.backupAllData = async (req, res) => {
+  try {
+    const users = await User.find({});
+    const transactions = await Transaction.find({});
+    const logs = await ActivityLog.find({});
+    
+    const backupData = {
+      backupDate: new Date().toISOString(),
+      version: '1.0',
+      data: {
+        users: users,
+        transactions: transactions,
+        activityLogs: logs
+      },
+      metadata: {
+        totalUsers: users.length,
+        totalTransactions: transactions.length,
+        totalLogs: logs.length
+      }
+    };
+    
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', 'attachment; filename=system_backup.json');
+    res.json(backupData);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 // Export Complete Report
-exports.exportCompleteReport = (req, res) => {
-  const { format = 'json' } = req.query;
-  
-  const reportData = {
-    reportDate: new Date().toISOString(),
-    summary: {
-      totalUsers: users.length,
-      totalSellers: users.filter(u => u.role === 'seller').length,
-      activeSellers: users.filter(u => u.role === 'seller' && u.status === 'active').length,
-      totalTransactions: transactions.length,
-      completedTransactions: transactions.filter(t => t.status === 'completed').length,
-      totalRevenue: transactions
-        .filter(t => t.status === 'completed' && t.type === 'sale')
-        .reduce((sum, t) => sum + t.amount, 0).toFixed(2),
-      totalActivities: activityLogs.length
-    },
-    users: users,
-    transactions: transactions,
-    activityLogs: activityLogs
-  };
-  
-  if (format === 'json') {
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', 'attachment; filename=complete_report.json');
-    return res.json(reportData);
+exports.exportCompleteReport = async (req, res) => {
+  try {
+    const { format = 'json' } = req.query;
+    
+    const users = await User.find({});
+    const transactions = await Transaction.find({});
+    const logs = await ActivityLog.find({});
+    
+    const totalRevenue = transactions
+      .filter(t => t.status === 'completed' && t.type === 'sale')
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    const reportData = {
+      reportDate: new Date().toISOString(),
+      summary: {
+        totalUsers: users.length,
+        totalSellers: users.filter(u => u.role === 'seller').length,
+        activeSellers: users.filter(u => u.role === 'seller' && u.status === 'active').length,
+        totalTransactions: transactions.length,
+        completedTransactions: transactions.filter(t => t.status === 'completed').length,
+        totalRevenue: totalRevenue.toFixed(2),
+        totalActivities: logs.length
+      },
+      users: users,
+      transactions: transactions,
+      activityLogs: logs
+    };
+    
+    if (format === 'json') {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', 'attachment; filename=complete_report.json');
+      return res.json(reportData);
+    }
+    
+    res.json({
+      success: true,
+      data: reportData
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
-  
-  res.json({
-    success: true,
-    data: reportData
-  });
 };
 
 // Helper function to convert JSON to CSV
@@ -161,6 +193,9 @@ function convertToCSV(data, columns) {
       let value = item[col];
       if (value instanceof Date) {
         value = value.toISOString();
+      }
+      if (value && typeof value === 'object') {
+        value = value.toString();
       }
       if (typeof value === 'string' && value.includes(',')) {
         value = `"${value}"`;
