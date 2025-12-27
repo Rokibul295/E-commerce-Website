@@ -24,6 +24,7 @@ const Header = () => {
             <>
               <Link to="/cart">Cart</Link>
               <Link to="/orders">Orders</Link>
+              {user?.isAdmin && <Link to="/admin">Admin</Link>}
               <span className="user-name">Hello, {user.name}</span>
               <button onClick={handleLogout} className="logout-btn">Logout</button>
             </>

@@ -6,6 +6,7 @@ import Cart from './components/Cart';
 import Login from './components/Login';
 import Register from './components/Register';
 import Orders from './components/Orders';
+import Admin from './components/Admin';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import './App.css';
 
@@ -38,6 +39,14 @@ function AppContent() {
                 <Orders />
               </PrivateRoute>
             } 
+          />
+          <Route
+            path="/admin"
+            element={
+              <PrivateRoute>
+                <Admin />
+              </PrivateRoute>
+            }
           />
         </Routes>
       </div>

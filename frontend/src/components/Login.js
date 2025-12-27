@@ -8,6 +8,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [adminMode, setAdminMode] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -19,7 +20,16 @@ const Login = () => {
     const result = await login(email, password);
     
     if (result.success) {
-      navigate('/');
+      const loggedUser = result.user;
+      if (adminMode) {
+        if (loggedUser?.isAdmin) {
+          navigate('/admin');
+        } else {
+          setError('You are not authorized as admin');
+        }
+      } else {
+        navigate('/');
+      }
     } else {
       setError(result.message);
     }
@@ -50,6 +60,16 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+          </div>
+          <div className="form-group">
+            <label>
+              <input
+                type="checkbox"
+                checked={adminMode}
+                onChange={(e) => setAdminMode(e.target.checked)}
+              />{' '}
+              Login as Admin
+            </label>
           </div>
           <button type="submit" disabled={loading} className="auth-btn">
             {loading ? 'Logging in...' : 'Login'}

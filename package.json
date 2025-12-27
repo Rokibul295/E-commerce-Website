@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "concurrently \"npm --prefix server run dev\" \"npm --prefix client start\""
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend start\""
   },
   "dependencies": {
     "react": "^19.2.3",

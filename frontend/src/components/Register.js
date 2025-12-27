@@ -7,6 +7,7 @@ const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [adminCode, setAdminCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
@@ -17,7 +18,7 @@ const Register = () => {
     setError('');
     setLoading(true);
 
-    const result = await register(name, email, password);
+    const result = await register(name, email, password, adminCode);
     
     if (result.success) {
       navigate('/');
@@ -60,6 +61,15 @@ const Register = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength="6"
+            />
+          </div>
+          <div className="form-group">
+            <label>Admin Code (optional)</label>
+            <input
+              type="text"
+              value={adminCode}
+              onChange={(e) => setAdminCode(e.target.value)}
+              placeholder="Leave blank for normal users"
             />
           </div>
           <button type="submit" disabled={loading} className="auth-btn">

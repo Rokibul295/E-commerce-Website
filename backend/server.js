@@ -22,6 +22,22 @@ app.use('/api/products', require('./routes/products'));
 app.use('/api/cart', require('./routes/cart'));
 app.use('/api/orders', require('./routes/orders'));
 
+// Serve frontend build (static files) and images when present
+const path = require('path');
+const buildPath = path.join(__dirname, '..', 'frontend', 'build');
+const publicImages = path.join(__dirname, '..', 'frontend', 'public', 'images');
+
+// Serve built frontend static files
+app.use(express.static(buildPath));
+
+// Serve images from frontend/public/images at /images/* so absolute paths work
+app.use('/images', express.static(publicImages));
+
+// For any other route not starting with /api, return the frontend index.html (single page app)
+app.get(/^(?!\/api).*/, (req, res) => {
+  res.sendFile(path.join(buildPath, 'index.html'));
+});
+
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/ecommerce')
   .then(() => console.log('MongoDB Connected'))

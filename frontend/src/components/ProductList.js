@@ -5,11 +5,11 @@ import './ProductList.css';
 
 // Demo fallback products for offline/dev mode
 const demoProducts = [
-  { _id: 'demo-1', name: 'Ceramic Coffee Mug', category: 'Home', price: 450, img: '/images/placeholder.svg', description: 'Handmade ceramic coffee mug' },
-  { _id: 'demo-2', name: 'Classic T-Shirt', category: 'Clothing', price: 500, img: '/images/placeholder.svg', description: 'Comfortable cotton t-shirt' },
-  { _id: 'demo-3', name: 'Wireless Headphones', category: 'Electronics', price: 2500, img: '/images/placeholder.svg', description: 'High-quality wireless headphones' },
-  { _id: 'demo-4', name: 'Leather Backpack', category: 'Accessories', price: 3200, img: '/images/placeholder.svg', description: 'Durable leather backpack for everyday carry' },
-  { _id: 'demo-5', name: 'Running Shoes', category: 'Footwear', price: 1800, img: '/images/placeholder.svg', description: 'Comfortable running shoes' }
+  { _id: 'demo-1', name: 'Ceramic Coffee Mug', category: 'Home', price: 450, img: '/images/mug.svg', description: 'Handmade ceramic coffee mug' },
+  { _id: 'demo-2', name: 'Classic T-Shirt', category: 'Clothing', price: 500, img: '/images/tshirt.svg', description: 'Comfortable cotton t-shirt' },
+  { _id: 'demo-3', name: 'Wireless Headphones', category: 'Electronics', price: 2500, img: '/images/headphones.svg', description: 'High-quality wireless headphones' },
+  { _id: 'demo-4', name: 'Leather Backpack', category: 'Accessories', price: 3200, img: '/images/backpack.svg', description: 'Durable leather backpack for everyday carry' },
+  { _id: 'demo-5', name: 'Running Shoes', category: 'Footwear', price: 1800, img: '/images/shoes.svg', description: 'Comfortable running shoes' }
 ];
 
 const ProductList = () => {

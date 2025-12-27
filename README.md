@@ -96,6 +96,13 @@ E-commerce-Website/
    MONGODB_URI=mongodb://localhost:27017/ecommerce
    JWT_SECRET=your_jwt_secret_key_here_change_in_production
    NODE_ENV=development
+
+   # Optional: allow registering/administering an admin user - choose a secret code
+   ADMIN_CODE=your_admin_code_here
+
+   # Optional: to seed an admin user via seed.js set these env vars before running `node seed.js`
+   ADMIN_EMAIL=admin@example.com
+   ADMIN_PASSWORD=strongpassword
    ```
 
 5. **Start MongoDB**
@@ -107,6 +114,8 @@ E-commerce-Website/
    cd backend
    node seed.js
    ```
+
+   Note: Product images are now local SVGs stored in `frontend/public/images`. Re-running `node seed.js` will reset products to use these local images.
 
 7. **Start the Backend Server**
    ```bash

@@ -3,8 +3,9 @@ const { validationResult } = require('express-validator');
 const User = require('../models/User');
 
 // Generate JWT Token
-const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET || 'your_jwt_secret_key_here_change_in_production', {
+const generateToken = (user) => {
+  // include isAdmin in token payload so middleware or clients can inspect role if needed
+  return jwt.sign({ userId: user._id, isAdmin: !!user.isAdmin }, process.env.JWT_SECRET || 'your_jwt_secret_key_here_change_in_production', {
     expiresIn: '30d'
   });
 };
@@ -18,7 +19,7 @@ exports.register = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, password } = req.body;
+    const { name, email, password, adminCode } = req.body;
 
     // Check if user already exists
     let user = await User.findOne({ email });
@@ -26,18 +27,22 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
+    // Determine admin role only if correct admin code is provided
+    const isAdmin = adminCode && adminCode === process.env.ADMIN_CODE;
+
     // Create new user
-    user = new User({ name, email, password });
+    user = new User({ name, email, password, isAdmin });
     await user.save();
 
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     res.status(201).json({
       token,
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        isAdmin: !!user.isAdmin
       }
     });
   } catch (error) {
@@ -69,14 +74,15 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     res.json({
       token,
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        isAdmin: !!user.isAdmin
       }
     });
   } catch (error) {
