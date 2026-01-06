@@ -85,7 +85,7 @@ const Reports = () => {
   const exportData = async (type, format = 'json') => {
     try {
       if (format === 'csv') {
-        const url = `http://localhost:5000/api/export/${type === 'users' ? 'users' : type === 'transactions' ? 'transactions' : 'logs'}?format=csv`
+        const url = `http://localhost:5001/api/export/${type === 'users' ? 'users' : type === 'transactions' ? 'transactions' : 'logs'}?format=csv` // Changed from 5000 to avoid macOS Control Center conflict
         window.open(url, '_blank')
         showMessage(`${type} exported as CSV successfully!`, 'success')
       } else {
@@ -151,7 +151,7 @@ const Reports = () => {
           justifyContent: 'center' 
         }}>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/admin')}
             className="btn btn-primary"
             style={{
               marginBottom: '0'

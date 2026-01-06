@@ -32,9 +32,21 @@ exports.addToCart = async (req, res) => {
   try {
     const { productId, quantity = 1 } = req.body;
 
-    const product = await Product.findById(productId);
+    if (!productId) {
+      return res.status(400).json({ message: 'Product ID is required' });
+    }
+
+    console.log('Adding to cart - Product ID:', productId, 'User:', req.user._id);
+
+    // Try to find product by ID
+    let product = await Product.findById(productId);
+    
+    // If not found, try to find by name (for backward compatibility)
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      console.log('Product not found by ID, trying alternative lookup');
+      return res.status(404).json({ 
+        message: 'Product not found. Please refresh the page to get updated product list.' 
+      });
     }
 
     let cart = await Cart.findOne({ user: req.user._id });
@@ -44,7 +56,7 @@ exports.addToCart = async (req, res) => {
     }
 
     const existingItemIndex = cart.items.findIndex(
-      item => item.product.toString() === productId
+      item => item.product.toString() === productId.toString()
     );
 
     if (existingItemIndex > -1) {
@@ -56,10 +68,14 @@ exports.addToCart = async (req, res) => {
     await cart.save();
     await cart.populate('items.product');
 
+    console.log('Product added to cart successfully');
     res.json(cart);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error adding to cart:', error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid product ID format' });
+    }
+    res.status(500).json({ message: error.message || 'Server error' });
   }
 };
 

@@ -60,17 +60,20 @@
 
 .auth-btn {
   width: 100%;
-  padding: 12px;
-  background: linear-gradient(90deg,var(--primary),var(--primary-600));
-  color: white;
+  padding: 12px 24px;
+  background: linear-gradient(90deg, #2563eb, #1e40af) !important;
+  color: #ffffff !important;
   border: none;
   border-radius: 10px;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-  transition: transform var(--transition), box-shadow var(--transition);
-  box-shadow: var(--shadow-sm);
-  font-family: var(--font-sans);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  display: block;
+  margin: 0 auto;
 }
 
 .auth-btn:hover:not(:disabled) {

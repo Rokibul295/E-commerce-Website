@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { userAPI, transactionAPI } from '../services/api'
+import './Dashboard.css'
 
 const Dashboard = () => {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const isSeller = user?.role === 'seller' && !user?.isAdmin
   const [activeTab, setActiveTab] = useState('overview')
   const [message, setMessage] = useState({ text: '', type: '' })
   const [stats, setStats] = useState(null)
@@ -157,44 +161,80 @@ const Dashboard = () => {
     <div>
       <header>
         <div className="container">
-          <h1>Admin Dashboard</h1>
-          <p>User & Transaction Management System</p>
+          <h1>{isSeller ? 'Seller Dashboard' : 'Admin Dashboard'}</h1>
+          <p>{isSeller ? 'Manage Your Products, Orders & Sales' : 'User & Transaction Management System'}</p>
         </div>
       </header>
 
       <div className="container">
-        <div className="tabs">
-          <button 
-            className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
-            onClick={() => setActiveTab('overview')}
-          >
-            Overview
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'sellers' ? 'active' : ''}`}
-            onClick={() => setActiveTab('sellers')}
-          >
-            Manage Sellers
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'transactions' ? 'active' : ''}`}
-            onClick={() => setActiveTab('transactions')}
-          >
-            Transactions
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'logs' ? 'active' : ''}`}
-            onClick={() => setActiveTab('logs')}
-          >
-            Activity Logs
-          </button>
-          <button 
-            className="tab-btn"
-            onClick={() => navigate('/reports')}
-          >
-            Reports & Export
-          </button>
-        </div>
+        {isSeller ? (
+          // Seller-specific navigation
+          <div className="seller-dashboard">
+            <div className="seller-quick-actions">
+              <div className="action-card" onClick={() => navigate('products')}>
+                <div className="action-icon">📦</div>
+                <h3>Manage Products</h3>
+                <p>Add, edit, and delete products</p>
+              </div>
+              <div className="action-card" onClick={() => navigate('seller-reports')}>
+                <div className="action-icon">📊</div>
+                <h3>Stock & Sales Reports</h3>
+                <p>View stock levels and sales data</p>
+              </div>
+              <div className="action-card" onClick={() => navigate('orders')}>
+                <div className="action-icon">📋</div>
+                <h3>Manage Orders</h3>
+                <p>Update order statuses</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          // Admin-specific navigation
+          <div className="tabs">
+            <button 
+              className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
+              onClick={() => setActiveTab('overview')}
+            >
+              Overview
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'sellers' ? 'active' : ''}`}
+              onClick={() => setActiveTab('sellers')}
+            >
+              Manage Sellers
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'transactions' ? 'active' : ''}`}
+              onClick={() => setActiveTab('transactions')}
+            >
+              Transactions
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'logs' ? 'active' : ''}`}
+              onClick={() => setActiveTab('logs')}
+            >
+              Activity Logs
+            </button>
+            <button 
+              className="tab-btn"
+              onClick={() => navigate('reports')}
+            >
+              Reports & Export
+            </button>
+            <button 
+              className="tab-btn"
+              onClick={() => navigate('products')}
+            >
+              Products
+            </button>
+            <button 
+              className="tab-btn"
+              onClick={() => navigate('orders')}
+            >
+              Orders
+            </button>
+          </div>
+        )}
 
         {message.text && (
           <div className={message.type === 'error' ? 'error' : 'success'}>
